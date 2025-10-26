@@ -1,3 +1,3 @@
-git add requirements.txt
-git commit -m "Añadir dependencias requeridas"
-git push
+streamlit
+pandas
+reportlab
