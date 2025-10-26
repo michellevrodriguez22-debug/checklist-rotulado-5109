@@ -1,4 +1,4 @@
-# app.py
+# app.py (versión corregida: wrap en PDF y cálculo de cumplimiento arreglado)
 import streamlit as st
 import pandas as pd
 from io import BytesIO
@@ -127,7 +127,7 @@ def init_state():
 init_state()
 
 # -----------------------------
-# Formulario inicial
+# Formulario inicial (sidebar)
 # -----------------------------
 st.sidebar.header("Datos de la verificación")
 producto = st.sidebar.text_input("Nombre del producto")
@@ -135,22 +135,29 @@ proveedor = st.sidebar.text_input("Proveedor / Fabricante")
 responsable = st.sidebar.text_input("Responsable de la verificación")
 nombre_pdf = st.sidebar.text_input("Nombre del archivo PDF (sin .pdf)", f"informe_{datetime.now().strftime('%Y%m%d')}")
 st.sidebar.markdown("---")
+st.sidebar.markdown("Filtro:")
+filter_no = st.sidebar.checkbox("Mostrar sólo No cumple", value=False)
 
 # -----------------------------
-# Checklist
+# Checklist (principal)
 # -----------------------------
 st.header("Checklist de cumplimiento normativo")
-st.markdown("Seleccione el estado correspondiente a cada requisito. Si marca **No cumple**, se mostrará una recomendación.")
+st.markdown("Seleccione el estado correspondiente a cada requisito. Si marca **No cumple**, se mostrará la recomendación asociada.")
 
 for item in CHECK_ITEMS:
     nombre, verificar, recomendacion, referencia = item
     estado = st.session_state.status.get(nombre, "none")
 
+    # aplicar filtro de mostrar solo 'No cumple'
+    if filter_no and estado != "no":
+        continue
+
     st.markdown(f"### {nombre}")
     st.markdown(f"**Qué verificar:** {verificar}")
     st.markdown(f"**Referencia:** {referencia}")
 
-    c1, c2, c3 = st.columns([0.2, 0.2, 0.6])
+    # botones horizontales compactos
+    c1, c2, c3, c4 = st.columns([0.12, 0.12, 0.12, 0.64])
     with c1:
         if st.button("✅ Cumple", key=f"{nombre}_yes"):
             st.session_state.status[nombre] = "yes"
@@ -160,90 +167,43 @@ for item in CHECK_ITEMS:
     with c3:
         if st.button("⚪ No aplica", key=f"{nombre}_na"):
             st.session_state.status[nombre] = "na"
-
+    # estado (badge) y recomendacion si fallo
     estado = st.session_state.status[nombre]
     if estado == "yes":
-        st.markdown("<div style='background:#e6ffed;padding:6px;border-radius:5px;'>✅ Cumple</div>", unsafe_allow_html=True)
+        st.markdown("<div style='display:inline-block;background:#e6ffed;padding:6px;border-radius:5px;'>✅ Cumple</div>", unsafe_allow_html=True)
     elif estado == "no":
-        st.markdown(f"<div style='background:#ffe6e6;padding:6px;border-radius:5px;'>❌ No cumple — {recomendacion}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='display:inline-block;background:#ffe6e6;padding:6px;border-radius:5px;'>❌ No cumple — {recomendacion}</div>", unsafe_allow_html=True)
     elif estado == "na":
-        st.markdown("<div style='background:#f2f2f2;padding:6px;border-radius:5px;'>⚪ No aplica</div>", unsafe_allow_html=True)
+        st.markdown("<div style='display:inline-block;background:#f2f2f2;padding:6px;border-radius:5px;'>⚪ No aplica</div>", unsafe_allow_html=True)
     else:
-        st.markdown("<div style='background:#fff;padding:6px;border-radius:5px;'>Sin responder</div>", unsafe_allow_html=True)
+        st.markdown("<div style='display:inline-block;background:#fff;padding:6px;border-radius:5px;'>Sin responder</div>", unsafe_allow_html=True)
 
     nota = st.text_area("Observación (opcional)", value=st.session_state.note.get(nombre, ""), key=f"{nombre}_nota")
     st.session_state.note[nombre] = nota
     st.markdown("---")
 
 # -----------------------------
-# Resumen
+# Resumen (cálculo corregido)
 # -----------------------------
-total = len(CHECK_ITEMS)
-cumple = sum(1 for k, v in st.session_state.status.items() if v == "yes")
-no_cumple = sum(1 for k, v in st.session_state.status.items() if v == "no")
-na = sum(1 for k, v in st.session_state.status.items() if v == "na")
-responde = total - sum(1 for v in st.session_state.status.values() if v == "none")
-denom = total - na
-porcentaje = int(round((cumple / denom * 100) if denom > 0 else 0))
+total_items = len(CHECK_ITEMS)
+yes_count = sum(1 for v in st.session_state.status.values() if v == "yes")
+no_count = sum(1 for v in st.session_state.status.values() if v == "no")
+na_count = sum(1 for v in st.session_state.status.values() if v == "na")
+none_count = sum(1 for v in st.session_state.status.values() if v == "none")
 
-st.metric("Cumplimiento total", f"{porcentaje}%")
-st.write(f"Cumple: {cumple} — No cumple: {no_cumple} — No aplica: {na} — Sin responder: {total - responde}")
+# CORRECCIÓN: cálculo del porcentaje sobre ítems contestados (yes + no)
+answered_applicable = yes_count + no_count  # excluye 'na' y 'none'
+if answered_applicable > 0:
+    porcentaje = int(round(yes_count / answered_applicable * 100))
+else:
+    porcentaje = 0
+
+st.metric("Cumplimiento total (sobre ítems contestados)", f"{porcentaje}%")
+st.write(f"Total ítems: {total_items} — Contestados (sí/no): {answered_applicable} — Cumple: {yes_count} — No cumple: {no_count} — No aplica: {na_count} — Sin responder: {none_count}")
 
 # -----------------------------
-# Generar PDF horizontal (A4)
+# Preparar DataFrame para PDF
 # -----------------------------
-def generar_pdf(df, producto, proveedor, responsable, porcentaje, nombre_archivo):
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        leftMargin=15 * mm,
-        rightMargin=15 * mm,
-        topMargin=15 * mm,
-        bottomMargin=15 * mm,
-    )
-    styles = getSampleStyleSheet()
-    style_normal = styles["Normal"]
-    style_bold = ParagraphStyle("bold", parent=style_normal, fontSize=10, spaceAfter=6)
-
-    story = []
-    story.append(Paragraph("<b>Informe de verificación de etiquetado nutricional — Juan Valdez</b>", style_bold))
-    story.append(Spacer(1, 4 * mm))
-    fecha_actual = datetime.now().strftime("%Y-%m-%d")
-    info = f"<b>Fecha:</b> {fecha_actual} &nbsp;&nbsp; <b>Producto:</b> {producto or '-'} &nbsp;&nbsp; <b>Proveedor:</b> {proveedor or '-'} &nbsp;&nbsp; <b>Responsable:</b> {responsable or '-'}"
-    story.append(Paragraph(info, style_normal))
-    story.append(Spacer(1, 6 * mm))
-    story.append(Paragraph(f"<b>Cumplimiento total:</b> {porcentaje}%", style_bold))
-    story.append(Spacer(1, 6 * mm))
-
-    data = [["Ítem", "Estado", "Recomendación", "Referencia", "Observación"]]
-    for _, row in df.iterrows():
-        data.append([
-            row["Ítem"],
-            row["Estado"],
-            row["Recomendación"],
-            row["Referencia"],
-            row["Observación"]
-        ])
-
-    col_widths = [70 * mm, 25 * mm, 75 * mm, 40 * mm, 80 * mm]
-    table = Table(data, colWidths=col_widths, repeatRows=1)
-    table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),
-        ("GRID", (0, 0), (-1, -1), 0.25, colors.grey),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("ALIGN", (1, 0), (-1, -1), "LEFT"),
-        ("LEFTPADDING", (0, 0), (-1, -1), 3),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    story.append(table)
-    doc.build(story)
-    buffer.seek(0)
-    return buffer
-
-# Generar DataFrame
 df = pd.DataFrame([{
     "Ítem": item[0],
     "Estado": ("Cumple" if st.session_state.status[item[0]] == "yes" else
@@ -254,8 +214,83 @@ df = pd.DataFrame([{
     "Observación": st.session_state.note[item[0]]
 } for item in CHECK_ITEMS])
 
+# -----------------------------
+# Generar PDF (A4 horizontal) con wrapping en celdas
+# -----------------------------
+def generar_pdf(df, producto, proveedor, responsable, porcentaje, nombre_archivo):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=landscape(A4),
+        leftMargin=12*mm, rightMargin=12*mm, topMargin=12*mm, bottomMargin=12*mm
+    )
+
+    styles = getSampleStyleSheet()
+    style_normal = styles["Normal"]
+    style_small = ParagraphStyle("small", parent=style_normal, fontSize=8, leading=10)
+    style_title = ParagraphStyle("title", parent=styles["Heading1"], fontSize=14, leading=16)
+
+    story = []
+    # Header
+    story.append(Paragraph("Informe de verificación de etiquetado nutricional — Juan Valdez", style_title))
+    story.append(Spacer(1, 3*mm))
+    fecha = datetime.now().strftime("%Y-%m-%d")
+    meta = f"<b>Fecha:</b> {fecha} &nbsp;&nbsp; <b>Producto:</b> {producto or '-'} &nbsp;&nbsp; <b>Proveedor:</b> {proveedor or '-'} &nbsp;&nbsp; <b>Responsable:</b> {responsable or '-'}"
+    story.append(Paragraph(meta, style_small))
+    story.append(Spacer(1, 4*mm))
+    story.append(Paragraph(f"<b>Cumplimiento (sobre ítems contestados):</b> {porcentaje} %", style_small))
+    story.append(Spacer(1, 6*mm))
+
+    # Table data: use Paragraph for wrapping in cells
+    table_data = [["Ítem", "Estado", "Recomendación", "Referencia", "Observación"]]
+    for _, r in df.iterrows():
+        # use Paragraph for cells that may be long
+        p_item = Paragraph(str(r["Ítem"]), style_small)
+        p_estado = Paragraph(str(r["Estado"]), style_small)
+        p_recom = Paragraph(str(r["Recomendación"]), style_small)
+        p_ref = Paragraph(str(r["Referencia"]), style_small)
+        p_obs = Paragraph(str(r["Observación"]) if r["Observación"] else "-", style_small)
+        table_data.append([p_item, p_estado, p_recom, p_ref, p_obs])
+
+    # Column widths (aprovechando A4 horizontal)
+    col_widths = [90*mm, 30*mm, 130*mm, 60*mm, 80*mm]
+    table = Table(table_data, colWidths=col_widths, repeatRows=1)
+    tbl_style = TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#f2f2f2")),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.black),
+        ("ALIGN", (0,0), (-1,0), "CENTER"),
+        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("FONTSIZE", (0,0), (-1,0), 9),
+        ("GRID", (0,0), (-1,-1), 0.3, colors.grey),
+        ("VALIGN", (0,0), (-1,-1), "TOP"),
+        ("LEFTPADDING", (0,0), (-1,-1), 4),
+        ("RIGHTPADDING", (0,0), (-1,-1), 4),
+    ])
+    table.setStyle(tbl_style)
+    story.append(table)
+    story.append(Spacer(1, 6*mm))
+
+    # Observaciones generales: listar las no conformidades brevemente
+    no_df = df[df["Estado"] == "No cumple"]
+    if not no_df.empty:
+        story.append(Paragraph("<b>No conformidades detectadas (resumen):</b>", style_small))
+        for _, r in no_df.iterrows():
+            text = f"- {r['Ítem']}: {r['Recomendación']}"
+            story.append(Paragraph(text, style_small))
+            story.append(Spacer(1, 1*mm))
+    else:
+        story.append(Paragraph("<b>No se detectaron no conformidades.</b>", style_small))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+# -----------------------------
 # Botón para generar PDF
+# -----------------------------
+st.markdown("---")
 st.subheader("Generar informe PDF (horizontal, empresarial)")
 if st.button("Generar PDF"):
     pdf_buffer = generar_pdf(df, producto, proveedor, responsable, porcentaje, nombre_pdf)
-    st.download_button("Descargar PDF", data=pdf_buffer, file_name=f"{nombre_pdf}.pdf", mime="application/pdf")
+    suggested_name = (nombre_pdf.strip() or f"informe_{datetime.now().strftime('%Y%m%d')}") + ".pdf"
+    st.download_button("Descargar PDF", data=pdf_buffer, file_name=suggested_name, mime="application/pdf")
