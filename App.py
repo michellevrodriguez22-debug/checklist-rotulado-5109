@@ -26,215 +26,273 @@ filter_no = st.sidebar.checkbox("Mostrar solo 'No cumple'", value=False)
 
 # -----------------------------------------------------------
 # ESTRUCTURA DE ÍTEMS AGRUPADOS POR CATEGORÍA
+# (Se mantiene tu estructura, solo se enriquecen los textos)
 # -----------------------------------------------------------
 CATEGORIAS = {
     "1. Identificación general del producto": [
         ("Nombre del alimento",
-         "Verificar que indique la verdadera naturaleza del producto; usar nombre específico, no genérico.",
+         "Verificar que el nombre refleje la verdadera naturaleza del producto (no genérico). En producto terminado debe describir el alimento final (p. ej., “Bebida de café con leche”); en materia prima, el insumo (p. ej., “Jarabe de glucosa”). (Art. 5.1 Res. 5109/2005)",
          "Debe indicar la verdadera naturaleza del producto.",
          "Art. 5.1 Resol. 5109/2005"),
 
         ("Marca comercial",
-         "Confirmar que la marca no sustituya el nombre del alimento.",
-         "Puede incluirse, pero no reemplaza el nombre del alimento.",
+         "Comprobar que la marca no sustituya la denominación del alimento. La marca puede acompañar, nunca reemplazar el nombre del alimento. (Art. 5.1.2 Res. 5109/2005)",
+         "Debe coexistir con la denominación del alimento.",
          "Art. 5.1.2 Resol. 5109/2005"),
 
         ("Lista de ingredientes",
-         "Comprobar que todos los ingredientes estén listados en orden decreciente de peso al momento de fabricación.",
+         "Revisar que todos los ingredientes estén listados en orden decreciente de peso al momento de fabricación; incluir aditivos con su categoría funcional y nombre específico (p. ej., “Conservante (Sorbato de potasio)”). En materias primas simples puede no aplicar. (Art. 5.2 Res. 5109/2005)",
          "Agregar lista completa y verificar el orden correcto.",
          "Art. 5.2 Resol. 5109/2005"),
 
         ("Aditivos alimentarios",
-         "Verificar que se declaren por su nombre común o categoría funcional (colorante, conservante, etc.).",
+         "Verificar que los aditivos se declaren por su nombre común o categoría funcional; no usar códigos o abreviaturas. (Art. 5.2.1 Res. 5109/2005)",
          "Declarar correctamente los aditivos alimentarios.",
          "Art. 5.2.1 Resol. 5109/2005"),
 
         ("Contenido neto",
-         "Verificar que esté declarado en unidades del Sistema Internacional y sin incluir el envase.",
-         "Declarar contenido neto en g, kg, mL o L.",
+         "Verificar que el contenido neto se exprese en unidades SI (g, kg, mL o L) sin incluir el envase, con legibilidad adecuada. Aplica principalmente para producto terminado envasado. (Anexo Res. 5109/2005)",
+         "Declarar contenido neto con unidad del Sistema Internacional.",
          "Art. 3 y Anexo Resol. 5109/2005"),
 
         ("Lote",
-         "Revisar que exista número o código de lote visible e indeleble.",
-         "Agregar o mejorar visibilidad del lote.",
+         "Comprobar que el número/código de lote sea visible, indeleble y legible para trazabilidad, tanto en producto terminado como en materia prima. (Art. 5.4 Res. 5109/2005)",
+         "Debe existir lote visible y legible.",
          "Art. 5.4 Resol. 5109/2005"),
 
         ("Fecha de vencimiento o duración mínima",
-         "Verificar formato, legibilidad y ubicación correcta.",
+         "Verificar legibilidad, ubicación y formato (día/mes/año). En materias primas corresponde al insumo; en producto terminado, al alimento para consumo. (Art. 5.5 Res. 5109/2005)",
          "Usar formato legible y visible (día/mes/año).",
          "Art. 5.5 Resol. 5109/2005"),
 
         ("País de origen",
-         "Comprobar que se declare 'Hecho en...' o 'Producto de...'.",
+         "Comprobar que se declare “Hecho en…” o “Producto de…”. Para materias primas de uso interno industrial puede no exigirse al consumidor final, pero debe obrar documentalmente. (Art. 5.9 Res. 5109/2005)",
          "Incluir país de origen claramente.",
          "Art. 5.9 Resol. 5109/2005"),
 
         ("Nombre y dirección del fabricante/importador",
-         "Revisar que la etiqueta contenga estos datos completos.",
+         "Revisar que incluya razón social y dirección completa del fabricante, importador o reenvasador, según aplique. (Art. 5.8 Res. 5109/2005)",
          "Incluir nombre y dirección completos.",
          "Art. 5.8 Resol. 5109/2005"),
     ],
 
     "2. Cumplimiento de requisitos gráficos y sanitarios": [
         ("Legibilidad",
-         "Asegurar que la información sea visible, indeleble y contrastante con el fondo.",
+         "Asegurar que la información sea visible, indeleble y contrastante con el fondo; tamaño de fuente suficiente y tipografía clara (Arial/Helvética sugeridas por Res. 810 para la tabla). (Art. 4 y 6 Res. 5109/2005; Art. 27 Res. 810/2021)",
          "Mejorar contraste o tamaño del texto.",
          "Art. 4 y 6 Resol. 5109/2005"),
 
         ("Idioma",
-         "Verificar que toda la información esté en español.",
+         "Verificar que toda la información obligatoria esté en español; si la etiqueta original está en otro idioma, usar rótulo complementario adherido. (Art. 5 Res. 5109/2005; Art. 27.1.3 Res. 810/2021)",
          "Agregar traducción completa en español si aplica.",
          "Art. 5 Resol. 5109/2005"),
 
         ("Ubicación del rótulo",
-         "Revisar que la etiqueta esté en la cara principal visible.",
+         "Revisar que la información esté en la cara principal visible al consumidor, sin ocultamientos ni pliegues que dificulten la lectura. (Art. 3 y 5 Res. 5109/2005)",
          "Reubicar etiqueta si no es visible para el consumidor.",
          "Art. 3 y 5 Resol. 5109/2005"),
 
         ("Prohibición de inducir a error",
-         "Verificar que no existan afirmaciones falsas o que atribuyan propiedades medicinales.",
+         "Verificar que no existan afirmaciones falsas, engañosas o que atribuyan propiedades medicinales; evitar imágenes o frases que puedan confundir. (Art. 4 Res. 5109/2005)",
          "Corregir mensajes que puedan inducir a error.",
          "Art. 4 Resol. 5109/2005"),
     ],
 
     "3. Etiquetado nutricional (Información nutricional obligatoria)": [
         ("Tabla nutricional presente",
-         "Confirmar que esté incluida en la etiqueta.",
-         "Incluir tabla con todos los nutrientes requeridos.",
+         "Confirmar presencia de la tabla nutricional cuando el producto se destine al consumidor final. Las materias primas industriales están exceptuadas. (Art. 2 y Art. 8–10 Res. 810/2021; mod. 2492/2022)",
+         "Incluir tabla con los nutrientes requeridos cuando aplique.",
          "Art. 8, 9 y 10 Resol. 810/2021"),
 
         ("Unidad de medida",
-         "Verificar que los valores estén expresados por 100 g/mL y por porción.",
+         "Verificar que los nutrientes se declaren por 100 g o 100 mL y por porción; coherencia con estado físico (sólido/líquido). (Art. 12 Res. 810/2021)",
          "Corregir las unidades según corresponda.",
          "Art. 12 Resol. 810/2021"),
 
         ("Porciones por envase",
-         "Verificar número de porciones por envase.",
+         "Revisar que indique el número de porciones por envase, salvo productos de peso variable. (Art. 12 y Par. 2 Art. 2 Res. 810 mod. 2492/2022)",
          "Agregar número de porciones si aplica.",
          "Art. 12 y Par. 2 Art. 2 Resol. 810 modif. 2492/2022"),
 
         ("Nutrientes adicionales",
-         "Verificar inclusión mínima y máxima permitida de vitaminas y minerales.",
-         "Ajustar declaración de micronutrientes según límites.",
+         "Cuando se declaren vitaminas/minerales, verificar que cumplan los requisitos de inclusión mínima/máxima y la presentación separada por una línea de los demás nutrientes. (Art. 15 y 28.3 Res. 810/2021)",
+         "Ajustar la declaración de micronutrientes según límites.",
          "Art. 15 Resol. 810/2021"),
 
         ("Tolerancias analíticas",
-         "Comprobar que las diferencias no superen ±20%.",
+         "Comparar valores declarados vs. análisis de laboratorio: la diferencia no debe superar ±20 %. (Art. 14 Res. 810/2021)",
          "Ajustar declaraciones según análisis.",
          "Art. 14 Resol. 810/2021"),
 
         ("Fuente de nutrientes",
-         "Verificar que cumpla con valores mínimos para usar términos como 'fuente de...'.",
+         "Para usar términos como “fuente de…/alto en…”, verificar mínimos establecidos por la norma y que el producto no presente sellos de advertencia que los invaliden. (Art. 16 Res. 810 mod. 2492/2022)",
          "Corregir o retirar declaraciones si no cumple.",
          "Art. 16 Resol. 810 modif. 2492/2022"),
     ],
 
     "4. Declaraciones nutricionales y de salud (voluntarias)": [
         ("Declaraciones nutricionales",
-         "Comprobar que cumplan el perfil de nutrientes y no tengan sellos de advertencia.",
+         "Permitir solo si el producto cumple con el perfil de nutrientes y no exhibe sellos de advertencia. Evitar términos ambiguos; sustentar cuantitativamente (p. ej., “fuente de…” con %VD). (Art. 25.4 Res. 810 mod. 2492/2022)",
          "Retirar declaraciones que no cumplan con los criterios.",
          "Art. 25.4 Resol. 810 modif. 2492/2022"),
 
         ("Declaraciones de salud",
-         "Verificar que estén autorizadas y con sustento científico.",
+         "Verificar que estén autorizadas por el MSPS, sean veraces y sustentadas científicamente; no atribuir propiedades medicinales. (Art. 25 Res. 810/2021)",
          "Incluir solo declaraciones aprobadas por el Ministerio.",
          "Art. 25 Resol. 810/2021"),
 
         ("Prohibición de declaraciones engañosas",
-         "Revisar que no induzcan a error sobre beneficios del producto.",
+         "Asegurar que el rótulo no induzca a error sobre composición o beneficios; evitar equivalencias simplistas no sustentadas. (Art. 25.5 Res. 810/2021)",
          "Eliminar declaraciones confusas o engañosas.",
          "Art. 25.5 Resol. 810/2021"),
     ],
 
     "5. Etiquetado frontal de advertencia (Sellos negros)": [
         ("Aplicabilidad",
-         "Verificar si aplica por exceso de azúcares, grasas saturadas, sodio o edulcorantes.",
+         "Verificar si aplica en alimentos procesados/ultraprocesados con exceso de azúcares, grasas saturadas, sodio o presencia de edulcorantes. (Art. 32 Res. 810 mod. 2492/2022)",
          "Evaluar composición para determinar necesidad de sellos.",
          "Art. 32 Resol. 810 modif. 2492/2022"),
 
         ("Forma y color",
-         "Revisar que el sello sea octagonal negro con borde blanco y texto 'EXCESO EN'.",
+         "Comprobar octágono negro, borde blanco y texto “EXCESO EN” en mayúsculas, tipografía adecuada. (Art. 32 Res. 2492/2022)",
          "Corregir forma o color según especificación oficial.",
          "Art. 32 Resol. 2492/2022"),
 
         ("Ubicación",
-         "Comprobar que esté en el tercio superior del panel principal.",
+         "Verificar ubicación en tercio superior de la cara principal de exhibición, visible y sin obstrucciones. (Art. 32 Res. 2492/2022)",
          "Reubicar sello si no cumple posición.",
          "Art. 32 Resol. 2492/2022"),
 
         ("Tamaño del sello",
-         "Verificar proporción con el área del envase según tabla 17.",
+         "Verificar dimensión mínima según el área principal del envase conforme a Tabla 17. (Art. 32 Res. 810 mod. 2492/2022)",
          "Ajustar tamaño del sello según tabla normativa.",
          "Art. 32 Resol. 810 modif. 2492/2022"),
 
         ("Tipografía",
-         "Verificar uso de fuente Arial Black, texto blanco sobre fondo negro.",
+         "Confirmar uso de tipografía blanca de alto contraste sobre fondo negro (Arial Black recomendada), sin otros elementos que distraigan. (Art. 32 Res. 810/2021)",
          "Corregir tipografía o contraste del sello.",
          "Art. 32 Resol. 810/2021"),
 
         ("Límite de nutrientes críticos",
-         "Evaluar si cumple los límites OPS: azúcares ≥10% kcal, grasas sat. ≥10% kcal, sodio ≥1 mg/kcal.",
-         "Revisar composición nutricional frente a límites establecidos.",
+         "Comparar con límites OPS: azúcares libres ≥10% kcal totales; grasas saturadas ≥10% kcal totales; grasas trans ≥1% kcal totales; sodio ≥1 mg/kcal o ≥300 mg/100 g (sólidos). Para bebidas sin aporte energético: criterio específico de sodio (≥40 mg/100 mL). Exceder obliga a sello. (Tabla 17 Res. 810 mod. 2492/2022)",
+         "Revisar composición frente a límites establecidos.",
          "Tabla 17 Resol. 810 modif. 2492/2022"),
 
         ("Sello 'Contiene edulcorante'",
-         "Verificar presencia del sello si contiene edulcorantes.",
+         "Si contiene edulcorantes (calóricos o no), incluir el sello correspondiente (“Contiene edulcorante, no recomendable en niños”). (Art. 32 Res. 2492/2022)",
          "Agregar sello correspondiente si aplica.",
          "Art. 32 Resol. 2492/2022"),
 
         ("Excepciones al sello",
-         "Verificar si el producto pertenece a excepciones (no procesados, típicos, infantiles, etc.).",
+         "Verificar si el producto se encuentra exento (no procesados o mínimamente procesados, típicos o artesanales, fórmulas infantiles, APMES, etc.). (Art. 2 Res. 810 mod. 2492/2022)",
          "Aplicar excepción cuando corresponda.",
          "Art. 2 Resol. 810 modif. 2492/2022"),
     ],
 
     "6. Requisitos especiales": [
         ("Carne cruda con condimentos",
-         "Verificar contenido de sodio y sello correspondiente si excede el límite.",
+         "Verificar el contenido de sodio; si excede 300 mg/100 g o 1 mg/kcal requiere sello frontal de sodio. (Par. 1 Art. 2 Res. 810 mod. 2492/2022)",
          "Incluir sello frontal si aplica.",
          "Par. 1 Art. 2 Resol. 810 modif. 2492/2022"),
 
         ("Productos a granel",
-         "Confirmar exención de etiquetado nutricional y frontal.",
+         "Confirmar exención de tabla nutricional y sellos cuando no hay envase individual; asegurar trazabilidad documental. (Art. 2 Res. 810 mod. 2492/2022)",
          "Registrar exención si aplica.",
          "Art. 2 Resol. 810 modif. 2492/2022"),
 
         ("Materias primas industriales",
-         "Confirmar que no requieran tabla nutricional.",
-         "Excluir etiquetado si no se vende al consumidor final.",
+         "Verificar que no requieran tabla nutricional ni sellos (no destinadas al consumidor final). Deben llevar identificación, lote, país de origen y fabricante. (Art. 2 Res. 810/2021)",
+         "Excluir etiquetado nutricional si no se vende al consumidor final.",
          "Art. 2 Resol. 810/2021"),
 
         ("Etiqueta de productos reempacados",
-         "Verificar que mantenga la información original.",
+         "Comprobar que mantenga toda la información original y agregue el responsable del reenvasado. (Art. 3 y 4 Res. 5109/2005)",
          "Incluir responsable del reenvasado.",
          "Art. 3 y 4 Resol. 5109/2005"),
 
         ("Productos importados",
-         "Confirmar que cumplan normas y estén traducidos al español.",
+         "Confirmar cumplimiento de normas nacionales y traducción al español mediante rótulo complementario cuando aplique. (Art. 2 Res. 5109/2005; Art. 27.1.3 Res. 810/2021)",
          "Agregar rótulo complementario si aplica.",
          "Art. 2 Resol. 5109/2005"),
     ],
 
     "7. Control y evidencia documental": [
         ("Certificado de análisis",
-         "Verificar existencia de soporte de laboratorio acreditado.",
+         "Verificar soporte analítico emitido por laboratorio acreditado para validar los valores nutricionales declarados. (Art. 14 Res. 810/2021)",
          "Adjuntar o solicitar certificado de análisis.",
          "Art. 14 Resol. 810/2021"),
 
         ("Registro sanitario",
-         "Comprobar visibilidad y vigencia del número INVIMA.",
+         "Comprobar visibilidad y vigencia del número INVIMA en productos terminados; en materias primas, contar con habilitaciones/soportes regulatorios aplicables. (Decreto 3075/1997; Res. 5109/2005)",
          "Actualizar o solicitar registro vigente.",
          "Decreto 3075/1997 y Resol. 5109/2005"),
 
         ("Evidencia fotográfica",
-         "Tomar fotografías del rótulo completo (frontal, lateral, trasera).",
+         "Tomar fotografías del rótulo (frontal, lateral, posterior) y anexarlas como respaldo de la inspección visual. (Guía INVIMA — práctica)",
          "Adjuntar evidencia visual al expediente.",
          "Guía INVIMA — práctica"),
     ]
 }
 
 # -----------------------------------------------------------
-# ESTADO INICIAL (si ya lo tienes en tu versión, puedes omitir este bloque)
+# MAPA DE APLICABILIDAD VISIBLE EN PANTALLA (Producto terminado / Materia prima / Ambos)
+# (No altera tu estructura; solo imprime una línea debajo de “Qué verificar”)
+# -----------------------------------------------------------
+APLICA = {
+    # Categoría 1
+    "Nombre del alimento": "Ambos",
+    "Marca comercial": "Ambos",
+    "Lista de ingredientes": "Producto terminado",
+    "Aditivos alimentarios": "Ambos",
+    "Contenido neto": "Producto terminado",
+    "Lote": "Ambos",
+    "Fecha de vencimiento o duración mínima": "Ambos",
+    "País de origen": "Ambos",
+    "Nombre y dirección del fabricante/importador": "Ambos",
+
+    # Categoría 2
+    "Legibilidad": "Ambos",
+    "Idioma": "Ambos",
+    "Ubicación del rótulo": "Ambos",
+    "Prohibición de inducir a error": "Ambos",
+
+    # Categoría 3
+    "Tabla nutricional presente": "Producto terminado",
+    "Unidad de medida": "Producto terminado",
+    "Porciones por envase": "Producto terminado",
+    "Nutrientes adicionales": "Producto terminado",
+    "Tolerancias analíticas": "Producto terminado",
+    "Fuente de nutrientes": "Producto terminado",
+
+    # Categoría 4
+    "Declaraciones nutricionales": "Producto terminado",
+    "Declaraciones de salud": "Producto terminado",
+    "Prohibición de declaraciones engañosas": "Ambos",
+
+    # Categoría 5
+    "Aplicabilidad": "Producto terminado",
+    "Forma y color": "Producto terminado",
+    "Ubicación": "Producto terminado",
+    "Tamaño del sello": "Producto terminado",
+    "Tipografía": "Producto terminado",
+    "Límite de nutrientes críticos": "Producto terminado",
+    "Sello 'Contiene edulcorante'": "Producto terminado",
+    "Excepciones al sello": "Producto terminado",
+
+    # Categoría 6
+    "Carne cruda con condimentos": "Producto terminado",
+    "Productos a granel": "Producto terminado",
+    "Materias primas industriales": "Materia prima",
+    "Etiqueta de productos reempacados": "Producto terminado",
+    "Productos importados": "Ambos",
+
+    # Categoría 7
+    "Certificado de análisis": "Ambos",
+    "Registro sanitario": "Producto terminado",
+    "Evidencia fotográfica": "Producto terminado",
+}
+# -----------------------------------------------------------
+# ESTADO INICIAL (se mantiene tu bloque)
 # -----------------------------------------------------------
 if "status" not in st.session_state:
     st.session_state.status = {i[0]: "none" for c in CATEGORIAS.values() for i in c}
@@ -242,7 +300,7 @@ if "note" not in st.session_state:
     st.session_state.note = {i[0]: "" for c in CATEGORIAS.values() for i in c}
 
 # -----------------------------------------------------------
-# INTERFAZ DE CHECKLIST
+# INTERFAZ DE CHECKLIST (se mantiene tu estructura)
 # -----------------------------------------------------------
 st.header("Checklist normativo completo")
 st.markdown("Cada criterio incluye **qué verificar**, su **recomendación** y **referencia normativa**. Responde con ✅ Cumple / ❌ No cumple / ⚪ No aplica.")
@@ -260,8 +318,9 @@ for categoria, items in CATEGORIAS.items():
         st.markdown(f"### {titulo}")
         st.markdown(f"**Qué verificar:** {que_verificar}")
         st.markdown(f"**Referencia:** {referencia}")
+        st.markdown(f"**Aplica a:** {APLICA.get(titulo, 'Ambos')}")
 
-        # 🔹 BLOQUE NUEVO — Solo para "Tamaño del sello" (Tabla 17 informativa)
+        # 🔹 BLOQUE informativo existente — Solo para "Tamaño del sello" (Tabla 17)
         if titulo == "Tamaño del sello":
             st.markdown("**Referencia normativa: Tabla 17 — Tamaño mínimo del sello según el área principal del envase**")
             opciones_tabla17 = {
@@ -285,7 +344,6 @@ for categoria, items in CATEGORIAS.items():
                 key=f"tabla17_{titulo}"
             )
             st.info(f"Tamaño mínimo del sello para envases de {seleccion_tabla17}: **{opciones_tabla17[seleccion_tabla17]}**")
-        # 🔹 FIN BLOQUE NUEVO
 
         c1, c2, c3, _ = st.columns([0.12, 0.12, 0.12, 0.64])
         with c1:
