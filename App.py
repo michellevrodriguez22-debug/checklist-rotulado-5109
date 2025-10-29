@@ -226,11 +226,6 @@ CATEGORIAS = {
          "Comprobar visibilidad y vigencia del número INVIMA en productos terminados; en materias primas, contar con habilitaciones/soportes regulatorios aplicables. (Decreto 3075/1997; Res. 5109/2005)",
          "Actualizar o solicitar registro vigente.",
          "Decreto 3075/1997 y Resol. 5109/2005"),
-
-        ("Evidencia fotográfica",
-         "Tomar fotografías del rótulo (frontal, lateral, posterior) y anexarlas como respaldo de la inspección visual. (Guía INVIMA — práctica)",
-         "Adjuntar evidencia visual al expediente.",
-         "Guía INVIMA — práctica"),
     ]
 }
 
