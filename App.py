@@ -265,14 +265,19 @@ for categoria, items in CATEGORIAS.items():
         if titulo == "Tamaño del sello":
             st.markdown("**Referencia normativa: Tabla 17 — Tamaño mínimo del sello según el área principal del envase**")
             opciones_tabla17 = {
-                "< 30 cm²": "1,5 cm de lado",
-                "30 a < 60 cm²": "2,0 cm de lado",
-                "60 a < 80 cm²": "2,5 cm de lado",
-                "80 a < 100 cm²": "3,0 cm de lado",
-                "100 a < 200 cm²": "3,5 cm de lado",
-                "200 a < 300 cm²": "4,0 cm de lado",
-                "300 a < 500 cm²": "5,0 cm de lado",
-                "≥ 500 cm²": "6,0 cm de lado"
+                "< 30 cm²": "Se rotula envase secundario y si no cuenta con el se incluye QR o página web para consultar",
+                "≥30 a < 35 cm²": "1,7 cm de lado",
+                "≥35 a < 40 cm²": "1,8 cm de lado",
+                "≥40 a < 50 cm²": "2,0 cm de lado",
+                "≥50 a < 60 cm²": "2,2 cm de lado",
+                "≥60 a < 80 cm²": "2,5 cm de lado",
+                "≥80 a < 100 cm²": "2,8 cm de lado",
+                "≥100 a < 125 cm²": "3,1 cm de lado",
+                "≥125 a < 150 cm²": "3,4 cm de lado",
+                "≥150 a < 200 cm²": "3,9 cm de lado"
+                "≥200 a < 250 cm²": "4,4 cm de lado",
+                "≥250 a < 300 cm²": "4,8 cm de lado",
+                "> 300 cm²": "15% del tamaño de la cara principal"
             }
             seleccion_tabla17 = st.selectbox(
                 "Consulta informativa (no se guarda en el reporte):",
