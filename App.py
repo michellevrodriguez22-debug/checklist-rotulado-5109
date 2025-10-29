@@ -274,7 +274,7 @@ for categoria, items in CATEGORIAS.items():
                 "≥80 a < 100 cm²": "2,8 cm de lado",
                 "≥100 a < 125 cm²": "3,1 cm de lado",
                 "≥125 a < 150 cm²": "3,4 cm de lado",
-                "≥150 a < 200 cm²": "3,9 cm de lado"
+                "≥150 a < 200 cm²": "3,9 cm de lado",
                 "≥200 a < 250 cm²": "4,4 cm de lado",
                 "≥250 a < 300 cm²": "4,8 cm de lado",
                 "> 300 cm²": "15% del tamaño de la cara principal"
